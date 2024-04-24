@@ -10,6 +10,8 @@ import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 import com.devtest.dto.Booking;
@@ -25,13 +27,13 @@ import com.devtest.manager.HotelBookingManager;
 
 public class HotelBookingApi {
 
-    private static BookingManager hotelBookingManager;
+    private static final Logger LOGGER = Logger.getLogger(HotelBookingApi.class.getName());
 
-    public HotelBookingApi() {
-        this.hotelBookingManager = new HotelBookingManager(10);
-    }
+    private static BookingManager hotelBookingManager = null;
 
     public static void main(String[] args) throws IOException {
+
+        hotelBookingManager = new HotelBookingManager(10);
 
         // Create HTTP server
         HttpServer server = HttpServer.create(new InetSocketAddress(8080), 0);
@@ -41,6 +43,9 @@ public class HotelBookingApi {
         server.createContext("/available-rooms", new AvailableRoomsHandler());
         server.createContext("/bookings-for-guest", new BookingsForGuestHandler());
 
+        // Set logger level
+        LOGGER.setLevel(Level.INFO);
+
         // Start the server
         server.start();
         System.out.println("Server started on port 8080");
@@ -49,6 +54,8 @@ public class HotelBookingApi {
     static class BookingsHandler implements HttpHandler {
         @Override
         public void handle(HttpExchange exchange) throws IOException {
+            LOGGER.info("Handling booking request...");
+
             try {
                 if ("POST".equals(exchange.getRequestMethod())) {
                     String requestBody = getRequestBody(exchange.getRequestBody());
@@ -68,6 +75,8 @@ public class HotelBookingApi {
                         os.write(response.getBytes());
                     }
                 } else {
+                    LOGGER.log(Level.SEVERE, "Error processing booking request", "Http Method not allow");
+
                     String response = "{\"error\": \"Method not allow\"}";
                     exchange.getResponseHeaders().set("Content-Type", "application/json");
                     exchange.sendResponseHeaders(HttpServletResponse.SC_OK, response.length());
@@ -78,6 +87,8 @@ public class HotelBookingApi {
 
                 }
             } catch (Exception e) {
+                LOGGER.log(Level.SEVERE, "Error processing booking request", e);
+
                 String errorMessage = "{\"error\": "+e.getMessage()+"}";
                 exchange.getResponseHeaders().set("Content-Type", "application/json");
                 exchange.sendResponseHeaders(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, errorMessage.length());
@@ -91,6 +102,7 @@ public class HotelBookingApi {
     static class AvailableRoomsHandler implements HttpHandler {
         @Override
         public void handle(HttpExchange exchange) throws IOException {
+            LOGGER.info("Handling available room request...");
             try {
                 if ("GET".equals(exchange.getRequestMethod())) {
                     // Parse query parameter to get the date
@@ -109,6 +121,8 @@ public class HotelBookingApi {
                         os.write(response.getBytes());
                     }
                 } else {
+                    LOGGER.log(Level.SEVERE, "Error processing available room request", "Http Method not allow");
+
                     String response = "{\"error\": \"Method not allow\"}";
                     exchange.getResponseHeaders().set("Content-Type", "application/json");
                     exchange.sendResponseHeaders(HttpServletResponse.SC_OK, response.length());
@@ -119,6 +133,8 @@ public class HotelBookingApi {
 
                 }
             } catch (Exception e) {
+                LOGGER.log(Level.SEVERE, "Error processing available room request", e);
+
                 String errorMessage = "{\"error\": "+e.getMessage()+"}";
                 exchange.getResponseHeaders().set("Content-Type", "application/json");
                 exchange.sendResponseHeaders(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, errorMessage.length());
@@ -132,6 +148,7 @@ public class HotelBookingApi {
     static class BookingsForGuestHandler implements HttpHandler {
         @Override
         public void handle(HttpExchange exchange) throws IOException {
+            LOGGER.info("Handling booking-for-guest request...");
             try {
                 if ("GET".equals(exchange.getRequestMethod())) {
                     // Parse query parameter to get the guest name
@@ -150,6 +167,8 @@ public class HotelBookingApi {
                         os.write(response.getBytes());
                     }
                 } else {
+                    LOGGER.log(Level.SEVERE, "Error processing booking-for-guest request", "Http Method not allow");
+
                     String response = "{\"error\": \"Method not allow\"}";
                     exchange.getResponseHeaders().set("Content-Type", "application/json");
                     exchange.sendResponseHeaders(HttpServletResponse.SC_OK, response.length());
@@ -160,6 +179,8 @@ public class HotelBookingApi {
 
                 }
             } catch (Exception e) {
+                LOGGER.log(Level.SEVERE, "Error processing booking-for-guest request", e);
+
                 String errorMessage = "{\"error\": "+e.getMessage()+"}";
                 exchange.getResponseHeaders().set("Content-Type", "application/json");
                 exchange.sendResponseHeaders(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, errorMessage.length());
