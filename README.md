@@ -42,7 +42,7 @@ java -cp target/classes com.devtest.controller.HotelBookingApi
 ## Example Requests
 - Store Booking:
 ```
-curl -X POST -d "guestName=John Doe&roomNumber=1&date=2024-04-25" http://localhost:8080/bookings
+curl -X POST -d "guestName=Anna Joe&roomNumber=1&date=2024-04-25" http://localhost:8080/bookings
 ```
 - Store Booking:
 ```
@@ -50,5 +50,5 @@ curl http://localhost:8080/available-rooms?date=2024-04-25
 ```
 - Find Bookings for Guest:
 ```
-curl http://localhost:8080/bookings-for-guest?guestName=John%20Doe
+curl http://localhost:8080/bookings-for-guest?guestName=Anna%20Joe
 ```
